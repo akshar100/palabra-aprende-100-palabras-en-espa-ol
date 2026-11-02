@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0D1117">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Palabra">
+  <meta name="description" content="Aprende 100 palabras esenciales en español con pistas de emojis, oraciones de contexto y quizzes interactivos.">
+  <title>Palabra - Aprende 100 Palabras en Español</title>
+  
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/svg+xml" href="./icon.svg">
+  <link rel="apple-touch-icon" href="./icon-192.png">
+  
+  <style>
+    :root {
+      --bg: #0D1117;
+      --card-bg: #161B22;
+      --card-border: #30363D;
+      --text: #F0F6FC;
+      --text-muted: #8B949E;
+      --primary: #F59E0B;
+      --primary-hover: #D97706;
+      --primary-light: rgba(245, 158, 11, 0.15);
+      --success: #10B981;
+      --success-bg: rgba(16, 185, 129, 0.2);
+      --error: #EF4444;
+      --error-bg: rgba(239, 68, 68, 0.2);
+      --accent: #6366F1;
+      --radius: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-x: hidden;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 480px;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      background: radial-gradient(circle at 50% 0%, #1c2333 0%, #0D1117 75%);
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+      padding: env(safe-area-inset-top, 16px) 16px env(safe-area-inset-bottom, 16px);
+    }
+
+    /* Top Action Bar */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 4px 8px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 1.25rem;
+      letter-spacing: -0.5px;
+      color: #fff;
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #F59E0B, #EC4899);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-icon {
+      background: #21262D;
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      min-width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-icon:active {
+      transform: scale(0.92);
+      background: #30363D;
+    }
+
+    .btn-install {
+      background: linear-gradient(135deg, #10B981, #059669);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.82rem;
+      padding: 0 14px;
+      height: 40px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.04); }
+    }
+
+    /* Progress & Stats */
+    .stats-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 4px 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .stat-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #1c2128;
+      border: 1px solid var(--card-border);
+      padding: 5px 12px;
+      border-radius: 20px;
+      color: #F0F6FC;
+    }
+
+    .stat-pill span {
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 8px;
+      background: #21262D;
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 4px 0 16px;
+      position: relative;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #F59E0B, #EC4899);
+      border-radius: 8px;
+      transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* Main Word Card */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      margin-bottom: 12px;
+    }
+
+    .word-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 28px 20px;
+      text-align: center;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .word-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #F59E0B, #EC4899, #6366F1);
+    }
+
+    .category-badge {
+      background: var(--primary-light);
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+
+    .emoji-clue {
+      font-size: 4.2rem;
+      line-height: 1.1;
+      filter: drop-shadow(0 8px 16px rgba(0,0,0,0.4));
+      cursor: pointer;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .emoji-clue:hover {
+      transform: scale(1.12) rotate(4deg);
+    }
+
+    .spanish-word {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .btn-pronounce {
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: var(--primary);
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.15rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn-pronounce:hover, .btn-pronounce:active {
+      background: var(--primary);
+      color: #000;
+      transform: scale(1.1);
+    }
+
+    .sentence-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px dashed var(--card-border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-top: 4px;
+      width: 100%;
+    }
+
+    .sentence-text {
+      font-size: 1rem;
+      line-height: 1.45;
+      color: #E6EDF3;
+      font-weight: 500;
+    }
+
+    .sentence-sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Action Controls */
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #F59E0B, #D97706);
+      color: #111;
+      font-weight: 800;
+      font-size: 1.1rem;
+      min-height: 52px;
+      border-radius: 16px;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary:active {
+      transform: scale(0.97);
+    }
+
+    .secondary-nav {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-secondary {
+      flex: 1;
+      min-height: 46px;
+      background: #21262D;
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      font-weight: 600;
+      font-size: 0.95rem;
+      border-radius: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-secondary:active {
+      transform: scale(0.96);
+      background: #30363D;
+    }
+
+    /* Quiz Stage */
+    .quiz-container {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .quiz-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      text-align: center;
+      margin-bottom: 2px;
+    }
+
+    .quiz-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .quiz-btn {
+      min-height: 58px;
+      background: #1C2128;
+      border: 2px solid var(--card-border);
+      border-radius: 14px;
+      color: #F0F6FC;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 8px 12px;
+      line-height: 1.25;
+      transition: all 0.15s ease;
+    }
+
+    .quiz-btn:active {
+      transform: scale(0.95);
+    }
+
+    .quiz-btn.correct {
+      background: var(--success-bg) !important;
+      border-color: var(--success) !important;
+      color: #34D399 !important;
+      animation: correctPop 0.4s ease;
+    }
+
+    .quiz-btn.incorrect {
+      background: var(--error-bg) !important;
+      border-color: var(--error) !important;
+      color: #F87171 !important;
+      animation: shake 0.4s ease;
+    }
+
+    @keyframes correctPop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Animated Animals Celebrations */
+    .animals-burst-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 999;
+      overflow: hidden;
+    }
+
+    .burst-animal {
+      position: absolute;
+      font-size: 3.5rem;
+      user-select: none;
+      pointer-events: none;
+      will-change: transform, opacity;
+      animation: flyAnimal 1.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+
+    @keyframes flyAnimal {
+      0% {
+        opacity: 0;
+        transform: translate(var(--startX), var(--startY)) scale(0.3) rotate(0deg);
+      }
+      20% {
+        opacity: 1;
+        transform: translate(var(--midX), var(--midY)) scale(1.35) rotate(var(--rot1));
+      }
+      85% {
+        opacity: 1;
+        transform: translate(var(--endX), var(--endY)) scale(1.1) rotate(var(--rot2));
+      }
+      100% {
+        opacity: 0;
+        transform: translate(var(--endX), calc(var(--endY) + 60px)) scale(0.6) rotate(var(--rot3));
+      }
+    }
+
+    /* Full Drawer (Words List & Filter) */
+    .drawer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      max-width: 480px;
+      margin: 0 auto;
+      height: 82vh;
+      background: #161B22;
+      border-top: 2px solid var(--card-border);
+      border-radius: 24px 24px 0 0;
+      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      transform: translateY(105%);
+      transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+    }
+
+    .drawer.open {
+      transform: translateY(0);
+    }
+
+    .drawer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .drawer-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+    }
+
+    .drawer-search {
+      margin: 12px 0;
+      width: 100%;
+      height: 44px;
+      background: #0D1117;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 1rem;
+      padding: 0 14px;
+      outline: none;
+    }
+
+    .drawer-search:focus {
+      border-color: var(--primary);
+    }
+
+    .words-catalog {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-right: 4px;
+    }
+
+    .catalog-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: #21262D;
+      border-radius: 12px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .catalog-item.active {
+      border-color: var(--primary);
+      background: rgba(245, 158, 11, 0.1);
+    }
+
+    .catalog-item.mastered {
+      border-left: 4px solid var(--success);
+    }
+
+    .drawer-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 998;
+      display: none;
+      backdrop-filter: blur(4px);
+    }
+
+    .drawer-backdrop.open {
+      display: block;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #F59E0B;
+      color: #000;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 12px 24px;
+      border-radius: 30px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 2000;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header>
+      <div class="brand">
+        <div class="brand-icon">🇪🇸</div>
+        <div>Palabra</div>
+      </div>
+      <div class="header-actions">
+        <button id="installBtn" class="btn-install" title="Instalar App">
+          📲 Instalar
+        </button>
+        <button id="btnList" class="btn-icon" title="Ver catálogo de 100 palabras">
+          📚
+        </button>
+        <button id="btnSoundToggle" class="btn-icon" title="Activar/Silenciar sonido">
+          🔊
+        </button>
+      </div>
+    </header>
+
+    <!-- Progress & Counters -->
+    <div class="stats-bar">
+      <div class="stat-pill">Palabra: <span id="wordIndexLabel">1</span> / 100</div>
+      <div class="stat-pill">Dominadas: <span id="masteredCountLabel">0</span> 🏆</div>
+      <div class="stat-pill">Racha: <span id="streakLabel">0</span> 🔥</div>
+    </div>
+    
+    <div class="progress-track">
+      <div id="progressFill" class="progress-fill" style="width: 1%;"></div>
+    </div>
+
+    <!-- Main Card Content -->
+    <div class="main-content">
+      <div class="word-card" id="wordCard">
+        <span class="category-badge" id="categoryBadge">ANIMALES</span>
+        
+        <div class="emoji-clue" id="emojiClue" title="Toca para animar">🐶🐾</div>
+        
+        <div class="spanish-word">
+          <span id="spanishWordText">el perro</span>
+          <button class="btn-pronounce" id="btnPronounce" title="Pronunciar en español">
+            🔊
+          </button>
+        </div>
+
+        <div class="sentence-box">
+          <div class="sentence-sub">Oración de ejemplo</div>
+          <div class="sentence-text" id="sentenceText">El perro ladra en el parque por la mañana.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation / Quiz Control Area -->
+    <div class="controls">
+      <!-- Flashcard mode primary action -->
+      <button class="btn-primary" id="btnNextQuiz">
+        <span>Siguiente: ¿Qué significa?</span> ➡️
+      </button>
+
+      <!-- Quiz mode: 4 random English options -->
+      <div class="quiz-container" id="quizContainer">
+        <div class="quiz-title">Selecciona la traducción correcta en inglés:</div>
+        <div class="quiz-grid" id="quizGrid">
+          <!-- 4 option buttons dynamically filled -->
+        </div>
+      </div>
+
+      <div class="secondary-nav">
+        <button class="btn-secondary" id="btnPrev">
+          ⬅️ Anterior
+        </button>
+        <button class="btn-secondary" id="btnSkip">
+          Saltar ⏩
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Words Catalog Drawer -->
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <div class="drawer" id="wordsDrawer">
+    <div class="drawer-header">
+      <div class="drawer-title">100 Palabras en Español</div>
+      <button class="btn-icon" id="btnCloseDrawer">✕</button>
+    </div>
+    <input type="text" class="drawer-search" id="drawerSearch" placeholder="Buscar palabra en español o inglés...">
+    <div class="words-catalog" id="wordsCatalog"></div>
+  </div>
+
+  <!-- Celebratory Burst Area -->
+  <div class="animals-burst-container" id="animalsContainer"></div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast">¡Correcto! 🎉</div>
+
+  <script>
+    // 100 Spanish Words Data
+    const WORDS = [{"id": 1, "es": "el perro", "en": "dog", "cat": "animals", "sentence": "El perro ladra en el parque por la mañana.", "emoji": "🐶🐾"}, {"id": 2, "es": "el gato", "en": "cat", "cat": "animals", "sentence": "El gato duerme tranquilo en el sofá.", "emoji": "🐱💤"}, {"id": 3, "es": "el pájaro", "en": "bird", "cat": "animals", "sentence": "El pájaro vuela alto sobre los árboles.", "emoji": "🐦🌳"}, {"id": 4, "es": "el caballo", "en": "horse", "cat": "animals", "sentence": "El caballo corre veloz por el campo abierto.", "emoji": "🐴🌾"}, {"id": 5, "es": "el pez", "en": "fish", "cat": "animals", "sentence": "El pez nada ágilmente en el agua cristalina.", "emoji": "🐟🌊"}, {"id": 6, "es": "el león", "en": "lion", "cat": "animals", "sentence": "El león es considerado el rey de la selva.", "emoji": "🦁👑"}, {"id": 7, "es": "el elefante", "en": "elephant", "cat": "animals", "sentence": "El elefante tiene una trompa muy larga y fuerte.", "emoji": "🐘🌿"}, {"id": 8, "es": "el mono", "en": "monkey", "cat": "animals", "sentence": "El mono come plátanos y salta entre ramas.", "emoji": "🐵🍌"}, {"id": 9, "es": "el ratón", "en": "mouse", "cat": "animals", "sentence": "El ratón busca un pequeño trozo de queso.", "emoji": "🐭🧀"}, {"id": 10, "es": "el oso", "en": "bear", "cat": "animals", "sentence": "El oso hiberna pacíficamente en su cueva durante el invierno.", "emoji": "🐻❄️"}, {"id": 11, "es": "la manzana", "en": "apple", "cat": "food", "sentence": "La manzana roja es muy dulce y crujiente.", "emoji": "🍎😋"}, {"id": 12, "es": "el pan", "en": "bread", "cat": "food", "sentence": "Compro pan caliente y fresco en la panadería.", "emoji": "🥖🍞"}, {"id": 13, "es": "el agua", "en": "water", "cat": "food", "sentence": "Beber agua pura es vital para mantenerse sano.", "emoji": "💧🥤"}, {"id": 14, "es": "la leche", "en": "milk", "cat": "food", "sentence": "Añado leche tibia a mi café de la mañana.", "emoji": "🥛☕"}, {"id": 15, "es": "el queso", "en": "cheese", "cat": "food", "sentence": "El queso derretido sobre la pizza sabe delicioso.", "emoji": "🧀🍕"}, {"id": 16, "es": "el arroz", "en": "rice", "cat": "food", "sentence": "El arroz blanco acompaña casi todas las comidas tradicionales.", "emoji": "🍚🥢"}, {"id": 17, "es": "el pollo", "en": "chicken", "cat": "food", "sentence": "El pollo asado tiene especias sabrosas y aromáticas.", "emoji": "🍗🔥"}, {"id": 18, "es": "la sopa", "en": "soup", "cat": "food", "sentence": "Una sopa caliente reconforta en días fríos de lluvia.", "emoji": "🍲🥄"}, {"id": 19, "es": "el huevo", "en": "egg", "cat": "food", "sentence": "Cocino un huevo frito para el desayuno diario.", "emoji": "🍳🧂"}, {"id": 20, "es": "la fruta", "en": "fruit", "cat": "food", "sentence": "Comer fruta fresca aporta vitaminas esenciales al cuerpo.", "emoji": "🍓🍇"}, {"id": 21, "es": "el café", "en": "coffee", "cat": "food", "sentence": "Un sorbo de café negro me despierta de inmediato.", "emoji": "☕⚡"}, {"id": 22, "es": "el té", "en": "tea", "cat": "food", "sentence": "Prefiero tomar té de manzanilla antes de dormir.", "emoji": "🍵🌙"}, {"id": 23, "es": "la naranja", "en": "orange", "cat": "food", "sentence": "Exprimir una naranja fresca da un jugo muy nutritivo.", "emoji": "🍊🧃"}, {"id": 24, "es": "la carne", "en": "meat", "cat": "food", "sentence": "La carne a la parrilla huele increíble.", "emoji": "🥩🔥"}, {"id": 25, "es": "el pescado", "en": "fish (food)", "cat": "food", "sentence": "El pescado fresco a la plancha es ligero y saludable.", "emoji": "🐟🍋"}, {"id": 26, "es": "la casa", "en": "house", "cat": "home", "sentence": "Nuestra casa tiene un jardín lleno de flores coloridas.", "emoji": "🏠🌸"}, {"id": 27, "es": "la puerta", "en": "door", "cat": "home", "sentence": "Cierra la puerta con llave al salir por seguridad.", "emoji": "🚪🔑"}, {"id": 28, "es": "la ventana", "en": "window", "cat": "home", "sentence": "Abro la ventana para que entre la brisa fresca.", "emoji": "🪟💨"}, {"id": 29, "es": "la mesa", "en": "table", "cat": "home", "sentence": "Ponemos los platos y cubiertos sobre la mesa de madera.", "emoji": "🪑🍽️"}, {"id": 30, "es": "la silla", "en": "chair", "cat": "home", "sentence": "Toma asiento en esta silla suave y cómoda.", "emoji": "🪑🛋️"}, {"id": 31, "es": "la cama", "en": "bed", "cat": "home", "sentence": "La cama está lista con sábanas limpias y suaves.", "emoji": "🛏️😴"}, {"id": 32, "es": "la cocina", "en": "kitchen", "cat": "home", "sentence": "En la cocina preparamos recetas familiares deliciosas.", "emoji": "🍳🧑‍🍳"}, {"id": 33, "es": "el baño", "en": "bathroom", "cat": "home", "sentence": "El baño tiene toallas limpias y jabón perfumado.", "emoji": "🚿🧼"}, {"id": 34, "es": "el libro", "en": "book", "cat": "objects", "sentence": "Leo un libro apasionante antes de apagar la luz.", "emoji": "📖✨"}, {"id": 35, "es": "el reloj", "en": "clock / watch", "cat": "objects", "sentence": "El reloj de pared marca exactamente las doce en punto.", "emoji": "⏰⏳"}, {"id": 36, "es": "el teléfono", "en": "phone", "cat": "objects", "sentence": "Mi teléfono suena con un mensaje de texto nuevo.", "emoji": "📱💬"}, {"id": 37, "es": "la llave", "en": "key", "cat": "objects", "sentence": "Olvidé la llave dorada dentro de mi bolsillo.", "emoji": "🔑🚪"}, {"id": 38, "es": "el dinero", "en": "money", "cat": "objects", "sentence": "Guardo el dinero en mi billetera para el viaje.", "emoji": "💵👛"}, {"id": 39, "es": "la ropa", "en": "clothes", "cat": "objects", "sentence": "Lavo la ropa sucia cada fin de semana.", "emoji": "👕🧺"}, {"id": 40, "es": "el zapato", "en": "shoe", "cat": "objects", "sentence": "Ato los cordones de mi zapato deportivo antes de correr.", "emoji": "👟🏃"}, {"id": 41, "es": "el sol", "en": "sun", "cat": "nature", "sentence": "El sol brilla radiante en el cielo despejado.", "emoji": "☀️🌤️"}, {"id": 42, "es": "la luna", "en": "moon", "cat": "nature", "sentence": "La luna llena ilumina la noche silenciosa.", "emoji": "🌕🌌"}, {"id": 43, "es": "la estrella", "en": "star", "cat": "nature", "sentence": "Una estrella fugaz cruza el firmamento oscuro.", "emoji": "⭐✨"}, {"id": 44, "es": "el cielo", "en": "sky", "cat": "nature", "sentence": "El cielo azul no tiene ninguna nube esta mañana.", "emoji": "🌤️☁️"}, {"id": 45, "es": "el mar", "en": "sea / ocean", "cat": "nature", "sentence": "Las olas del mar rompen suavemente en la orilla de arena.", "emoji": "🌊🏖️"}, {"id": 46, "es": "el río", "en": "river", "cat": "nature", "sentence": "El río desciende con fuerza desde las montañas nevadas.", "emoji": "🏞️💧"}, {"id": 47, "es": "la montaña", "en": "mountain", "cat": "nature", "sentence": "Subir a la cima de la montaña requiere esfuerzo.", "emoji": "⛰️🥾"}, {"id": 48, "es": "el árbol", "en": "tree", "cat": "nature", "sentence": "El árbol da una sombra fresca y agradable en verano.", "emoji": "🌳🍃"}, {"id": 49, "es": "la flor", "en": "flower", "cat": "nature", "sentence": "La flor silvestre desprende un aroma dulce e intenso.", "emoji": "🌸🐝"}, {"id": 50, "es": "la lluvia", "en": "rain", "cat": "nature", "sentence": "El sonido de la lluvia ayuda a calmar la mente.", "emoji": "🌧️☂️"}, {"id": 51, "es": "el fuego", "en": "fire", "cat": "nature", "sentence": "El fuego de la fogata nos mantiene calientes.", "emoji": "🔥🪵"}, {"id": 52, "es": "el viento", "en": "wind", "cat": "nature", "sentence": "Un viento fresco mueve suavemente las hojas del jardín.", "emoji": "💨🍃"}, {"id": 53, "es": "la tierra", "en": "earth / soil", "cat": "nature", "sentence": "La tierra húmeda es perfecta para plantar nuevas semillas.", "emoji": "🌍🌱"}, {"id": 54, "es": "el camino", "en": "road / path", "cat": "places", "sentence": "Este camino de piedra conduce directamente a la colina.", "emoji": "🛤️🚶"}, {"id": 55, "es": "la ciudad", "en": "city", "cat": "places", "sentence": "La ciudad nunca duerme con tantas luces encendidas.", "emoji": "🏙️🚦"}, {"id": 56, "es": "el parque", "en": "park", "cat": "places", "sentence": "Los niños corren y juegan alegres en el parque verde.", "emoji": "🌳🛝"}, {"id": 57, "es": "la escuela", "en": "school", "cat": "places", "sentence": "En la escuela aprendemos ciencias, arte e idiomas nuevos.", "emoji": "🏫🎒"}, {"id": 58, "es": "el hospital", "en": "hospital", "cat": "places", "sentence": "Los médicos y enfermeros trabajan con dedicación en el hospital.", "emoji": "🏥🩺"}, {"id": 59, "es": "la tienda", "en": "store / shop", "cat": "places", "sentence": "Compro verduras frescas en la pequeña tienda del barrio.", "emoji": "🏪🛒"}, {"id": 60, "es": "la playa", "en": "beach", "cat": "places", "sentence": "Caminar descalzo por la playa al atardecer relaja mucho.", "emoji": "🏖️🐚"}, {"id": 61, "es": "el amigo", "en": "friend", "cat": "people", "sentence": "Un buen amigo siempre escucha y brinda su apoyo sincero.", "emoji": "🤝😊"}, {"id": 62, "es": "la familia", "en": "family", "cat": "people", "sentence": "Nos reunimos con toda la familia los domingos para almorzar.", "emoji": "👨‍👩‍👧‍👦❤️"}, {"id": 63, "es": "el niño", "en": "boy / child", "cat": "people", "sentence": "El niño sonríe emocionado con su juguete favorito.", "emoji": "👦🎈"}, {"id": 64, "es": "la niña", "en": "girl", "cat": "people", "sentence": "La niña dibuja un arcoíris con lápices de colores.", "emoji": "👧🎨"}, {"id": 65, "es": "el hombre", "en": "man", "cat": "people", "sentence": "El hombre camina a paso firme hacia su lugar de trabajo.", "emoji": "👨💼"}, {"id": 66, "es": "la mujer", "en": "woman", "cat": "people", "sentence": "La mujer lidera con sabiduría y entusiasmo el proyecto.", "emoji": "👩💡"}, {"id": 67, "es": "el profesor", "en": "teacher", "cat": "people", "sentence": "El profesor explica con paciencia las reglas de gramática.", "emoji": "👨‍🏫📚"}, {"id": 68, "es": "el médico", "en": "doctor", "cat": "people", "sentence": "El médico examina al paciente con sumo cuidado.", "emoji": "👨‍⚕️💊"}, {"id": 69, "es": "la cabeza", "en": "head", "cat": "body", "sentence": "Uso un sombrero para proteger mi cabeza del sol intenso.", "emoji": "🗣️🧢"}, {"id": 70, "es": "el ojo", "en": "eye", "cat": "body", "sentence": "El ojo humano puede percibir miles de tonos y colores.", "emoji": "👁️✨"}, {"id": 71, "es": "la mano", "en": "hand", "cat": "body", "sentence": "Levanta la mano derecha para saludar con entusiasmo.", "emoji": "✋👋"}, {"id": 72, "es": "el pie", "en": "foot", "cat": "body", "sentence": "Doy un paso adelante con el pie derecho.", "emoji": "🦶👟"}, {"id": 73, "es": "el corazón", "en": "heart", "cat": "body", "sentence": "Mi corazón late con fuerza y emoción.", "emoji": "❤️💓"}, {"id": 74, "es": "la boca", "en": "mouth", "cat": "body", "sentence": "Una sonrisa amable en la boca alegra a cualquiera.", "emoji": "👄😄"}, {"id": 75, "es": "la oreja", "en": "ear", "cat": "body", "sentence": "Escucho con atención cada palabra a través de mi oreja.", "emoji": "👂🎶"}, {"id": 76, "es": "el brazo", "en": "arm", "cat": "body", "sentence": "Extiende el brazo para alcanzar el frasco de la repisa.", "emoji": "💪🎯"}, {"id": 77, "es": "grande", "en": "big / large", "cat": "adjectives", "sentence": "Ese edificio moderno es increíblemente grande y alto.", "emoji": "🐘🏢"}, {"id": 78, "es": "pequeño", "en": "small / little", "cat": "adjectives", "sentence": "Un pájaro pequeño cabe suavemente en la palma de la mano.", "emoji": "🐥🤏"}, {"id": 79, "es": "bueno", "en": "good", "cat": "adjectives", "sentence": "Hacer ejercicio regular es muy bueno para la salud física y mental.", "emoji": "👍🌟"}, {"id": 80, "es": "malo", "en": "bad", "cat": "adjectives", "sentence": "Comer con exceso de sal puede ser malo a largo plazo.", "emoji": "👎⚠️"}, {"id": 81, "es": "feliz", "en": "happy", "cat": "adjectives", "sentence": "Me siento muy feliz celebrando mi cumpleaños con seres queridos.", "emoji": "😄🎉"}, {"id": 82, "es": "triste", "en": "sad", "cat": "adjectives", "sentence": "Escuchar una melodía melancólica me pone un poco triste.", "emoji": "😢🌧️"}, {"id": 83, "es": "rápido", "en": "fast / quick", "cat": "adjectives", "sentence": "El tren de alta velocidad es extremadamente rápido y puntual.", "emoji": "⚡🚄"}, {"id": 84, "es": "lento", "en": "slow", "cat": "adjectives", "sentence": "La tortuga avanza a paso lento pero constante.", "emoji": "🐢⏳"}, {"id": 85, "es": "caliente", "en": "hot", "cat": "adjectives", "sentence": "Cuidado al servirte porque la taza de té está muy caliente.", "emoji": "🔥☕"}, {"id": 86, "es": "frío", "en": "cold", "cat": "adjectives", "sentence": "El viento de invierno es helado y sumamente frío.", "emoji": "❄️🥶"}, {"id": 87, "es": "nuevo", "en": "new", "cat": "adjectives", "sentence": "Comencé a leer un libro nuevo recién salido de imprenta.", "emoji": "✨🆕"}, {"id": 88, "es": "viejo", "en": "old", "cat": "adjectives", "sentence": "Ese puente de piedra viejo guarda siglos de historia.", "emoji": "🏛️🕰️"}, {"id": 89, "es": "hablar", "en": "to speak / talk", "cat": "verbs", "sentence": "Me encanta hablar en español con amigos de todo el mundo.", "emoji": "🗣️💬"}, {"id": 90, "es": "comer", "en": "to eat", "cat": "verbs", "sentence": "Vamos a comer una cena deliciosa y saludable juntos.", "emoji": "🍽️🥗"}, {"id": 91, "es": "vivir", "en": "to live", "cat": "verbs", "sentence": "Es un gran sueño vivir cerca de la costa frente al mar.", "emoji": "🏡🌊"}, {"id": 92, "es": "aprender", "en": "to learn", "cat": "verbs", "sentence": "Aprender palabras cada día expande tu mente exponencialmente.", "emoji": "🧠📚"}, {"id": 93, "es": "escribir", "en": "to write", "cat": "verbs", "sentence": "Disfruto escribir reflexiones y notas en mi libreta personal.", "emoji": "✍️📝"}, {"id": 94, "es": "dormir", "en": "to sleep", "cat": "verbs", "sentence": "Es necesario dormir ocho horas diarias para tener energía.", "emoji": "😴🛏️"}, {"id": 95, "es": "caminar", "en": "to walk", "cat": "verbs", "sentence": "Salgo a caminar temprano para respirar aire puro.", "emoji": "🚶🌳"}, {"id": 96, "es": "viajar", "en": "to travel", "cat": "verbs", "sentence": "Viajar por diferentes países te permite conocer culturas increíbles.", "emoji": "✈️🌍"}, {"id": 97, "es": "amar", "en": "to love", "cat": "verbs", "sentence": "Amar y respetar a los demás es el pilar de la convivencia.", "emoji": "❤️🥰"}, {"id": 98, "es": "escuchar", "en": "to listen", "cat": "verbs", "sentence": "Me relaja escuchar el sonido de las olas y las aves.", "emoji": "🎧🎵"}, {"id": 99, "es": "pensar", "en": "to think", "cat": "verbs", "sentence": "Tómate un instante para pensar antes de tomar una decisión importante.", "emoji": "🤔💡"}, {"id": 100, "es": "sonreír", "en": "to smile", "cat": "verbs", "sentence": "Sonreír ilumina el rostro y transmite calidez a quien te rodea.", "emoji": "😊✨"}];
+
+    // State Variables
+    let currentIndex = 0;
+    let isQuizMode = false;
+    let masteredWords = new Set();
+    let currentStreak = 0;
+    let soundEnabled = true;
+    let deferredPrompt = null;
+
+    // Celebration Animal Emojis
+    const ANIMALS = ['🐶', '🐱', '🦊', '🐰', '🦁', '🐬', '🦜', '🦄', '🐼', '🐯', '🐸', '🐨'];
+
+    // DOM Elements
+    const wordCard = document.getElementById('wordCard');
+    const categoryBadge = document.getElementById('categoryBadge');
+    const emojiClue = document.getElementById('emojiClue');
+    const spanishWordText = document.getElementById('spanishWordText');
+    const sentenceText = document.getElementById('sentenceText');
+    const btnPronounce = document.getElementById('btnPronounce');
+    const btnNextQuiz = document.getElementById('btnNextQuiz');
+    const quizContainer = document.getElementById('quizContainer');
+    const quizGrid = document.getElementById('quizGrid');
+    const btnPrev = document.getElementById('btnPrev');
+    const btnSkip = document.getElementById('btnSkip');
+    const wordIndexLabel = document.getElementById('wordIndexLabel');
+    const masteredCountLabel = document.getElementById('masteredCountLabel');
+    const streakLabel = document.getElementById('streakLabel');
+    const progressFill = document.getElementById('progressFill');
+    const btnSoundToggle = document.getElementById('btnSoundToggle');
+    const installBtn = document.getElementById('installBtn');
+    const btnList = document.getElementById('btnList');
+    const btnCloseDrawer = document.getElementById('btnCloseDrawer');
+    const wordsDrawer = document.getElementById('wordsDrawer');
+    const drawerBackdrop = document.getElementById('drawerBackdrop');
+    const wordsCatalog = document.getElementById('wordsCatalog');
+    const drawerSearch = document.getElementById('drawerSearch');
+    const animalsContainer = document.getElementById('animalsContainer');
+    const toast = document.getElementById('toast');
+
+    // Web Audio Synthesizer
+    let audioCtx = null;
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function playSuccessSound() {
+      if (!soundEnabled) return;
+      try {
+        const ctx = getAudioContext();
+        const now = ctx.currentTime;
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+          gain.gain.setValueAtTime(0.001, now + idx * 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.3, now + idx * 0.08 + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.08 + 0.5);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now + idx * 0.08);
+          osc.stop(now + idx * 0.08 + 0.55);
+        });
+      } catch (e) {
+        console.warn('Audio error:', e);
+      }
+    }
+
+    function playErrorSound() {
+      if (!soundEnabled) return;
+      try {
+        const ctx = getAudioContext();
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220, now);
+        osc.frequency.linearRampToValueAtTime(140, now + 0.25);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.26);
+      } catch (e) {
+        console.warn(e);
+      }
+    }
+
+    // Text to Speech
+    function speakSpanish(text) {
+      if (!window.speechSynthesis) return;
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'es-ES';
+      utterance.rate = 0.9;
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // Local Storage Persistence
+    function saveState() {
+      try {
+        const state = {
+          currentIndex,
+          mastered: Array.from(masteredWords),
+          streak: currentStreak,
+          soundEnabled
+        };
+        localStorage.setItem('palabra_pwa_state_v1', JSON.stringify(state));
+      } catch (e) {
+        console.warn('Could not save state to localStorage:', e);
+      }
+    }
+
+    function restoreState() {
+      try {
+        const saved = localStorage.getItem('palabra_pwa_state_v1');
+        if (saved) {
+          const state = JSON.parse(saved);
+          currentIndex = state.currentIndex || 0;
+          masteredWords = new Set(state.mastered || []);
+          currentStreak = state.streak || 0;
+          soundEnabled = state.soundEnabled !== false;
+        }
+      } catch (e) {
+        console.warn('Could not restore state:', e);
+      }
+      updateSoundButtonUI();
+    }
+
+    function updateSoundButtonUI() {
+      btnSoundToggle.textContent = soundEnabled ? '🔊' : '🔇';
+    }
+
+    // Render Current Word
+    function renderWord() {
+      const word = WORDS[currentIndex];
+      categoryBadge.textContent = word.cat;
+      emojiClue.textContent = word.emoji;
+      spanishWordText.textContent = word.es;
+      sentenceText.textContent = word.sentence;
+
+      wordIndexLabel.textContent = (currentIndex + 1);
+      masteredCountLabel.textContent = masteredWords.size;
+      streakLabel.textContent = currentStreak;
+      progressFill.style.width = ((currentIndex + 1) / WORDS.length * 100) + '%';
+
+      showFlashcardMode();
+      saveState();
+    }
+
+    function showFlashcardMode() {
+      isQuizMode = false;
+      btnNextQuiz.style.display = 'flex';
+      quizContainer.style.display = 'none';
+      btnNextQuiz.innerHTML = '<span>Siguiente: ¿Qué significa?</span> ➡️';
+    }
+
+    function showQuizMode() {
+      isQuizMode = true;
+      btnNextQuiz.style.display = 'none';
+      quizContainer.style.display = 'flex';
+
+      const current = WORDS[currentIndex];
+      const distractors = WORDS.filter(w => w.id !== current.id);
+      const shuffled = [...distractors].sort(() => 0.5 - Math.random()).slice(0, 3);
+      const options = [current, ...shuffled].sort(() => 0.5 - Math.random());
+
+      quizGrid.innerHTML = '';
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-btn';
+        btn.textContent = opt.en;
+        btn.onclick = () => handleAnswer(opt.id === current.id, btn);
+        quizGrid.appendChild(btn);
+      });
+    }
+
+    function handleAnswer(isCorrect, buttonElem) {
+      const allBtns = quizGrid.querySelectorAll('.quiz-btn');
+      allBtns.forEach(b => b.disabled = true);
+
+      if (isCorrect) {
+        buttonElem.classList.add('correct');
+        masteredWords.add(WORDS[currentIndex].id);
+        currentStreak++;
+        playSuccessSound();
+        triggerAnimalsCelebration();
+        showToast('¡Excelente! 🎉 ' + WORDS[currentIndex].en);
+
+        setTimeout(() => {
+          goNext();
+        }, 1400);
+      } else {
+        buttonElem.classList.add('incorrect');
+        currentStreak = 0;
+        playErrorSound();
+        showToast('¡Casi! Inténtalo otra vez 🤔');
+
+        const current = WORDS[currentIndex];
+        allBtns.forEach(b => {
+          if (b.textContent === current.en) {
+            b.classList.add('correct');
+          }
+        });
+
+        setTimeout(() => {
+          allBtns.forEach(b => b.disabled = false);
+        }, 1200);
+      }
+
+      masteredCountLabel.textContent = masteredWords.size;
+      streakLabel.textContent = currentStreak;
+      saveState();
+    }
+
+    function triggerAnimalsCelebration() {
+      const count = 14;
+      const rect = wordCard.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement('div');
+        el.className = 'burst-animal';
+        el.textContent = ANIMALS[Math.floor(Math.random() * ANIMALS.length)];
+
+        const angle = (Math.PI * 2 * i) / count + (Math.random() * 0.4 - 0.2);
+        const distanceMid = 120 + Math.random() * 140;
+        const distanceEnd = distanceMid + 100 + Math.random() * 120;
+
+        const startX = centerX + 'px';
+        const startY = centerY + 'px';
+        const midX = (centerX + Math.cos(angle) * distanceMid) + 'px';
+        const midY = (centerY + Math.sin(angle) * distanceMid - 50) + 'px';
+        const endX = (centerX + Math.cos(angle) * distanceEnd) + 'px';
+        const endY = (centerY + Math.sin(angle) * distanceEnd + 40) + 'px';
+
+        el.style.setProperty('--startX', startX);
+        el.style.setProperty('--startY', startY);
+        el.style.setProperty('--midX', midX);
+        el.style.setProperty('--midY', midY);
+        el.style.setProperty('--endX', endX);
+        el.style.setProperty('--endY', endY);
+        el.style.setProperty('--rot1', (Math.random() * 60 - 30) + 'deg');
+        el.style.setProperty('--rot2', (Math.random() * 90 - 45) + 'deg');
+        el.style.setProperty('--rot3', (Math.random() * 120 - 60) + 'deg');
+
+        animalsContainer.appendChild(el);
+        setTimeout(() => el.remove(), 1700);
+      }
+    }
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 1500);
+    }
+
+    function goNext() {
+      currentIndex = (currentIndex + 1) % WORDS.length;
+      renderWord();
+    }
+
+    function goPrev() {
+      currentIndex = (currentIndex - 1 + WORDS.length) % WORDS.length;
+      renderWord();
+    }
+
+    function renderCatalog(filterText = '') {
+      wordsCatalog.innerHTML = '';
+      const filter = filterText.toLowerCase().trim();
+
+      WORDS.forEach((w, idx) => {
+        if (filter && !w.es.toLowerCase().includes(filter) && !w.en.toLowerCase().includes(filter)) {
+          return;
+        }
+        const item = document.createElement('div');
+        const isMastered = masteredWords.has(w.id);
+        const isActive = idx === currentIndex;
+
+        item.className = 'catalog-item ' + (isActive ? 'active ' : '') + (isMastered ? 'mastered' : '');
+        item.innerHTML = `
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:1.4rem;">` + (w.emoji.split(' ')[0] || '✨') + `</span>
+            <div>
+              <div style="font-weight:700; color:#fff;">` + (idx + 1) + `. ` + w.es + `</div>
+              <div style="font-size:0.8rem; color:var(--text-muted);">` + w.en + `</div>
+            </div>
+          </div>
+          <div>` + (isMastered ? '🏆' : '⚪') + `</div>
+        `;
+
+        item.onclick = () => {
+          currentIndex = idx;
+          renderWord();
+          closeDrawer();
+        };
+        wordsCatalog.appendChild(item);
+      });
+    }
+
+    function openDrawer() {
+      renderCatalog();
+      wordsDrawer.classList.add('open');
+      drawerBackdrop.classList.add('open');
+    }
+
+    function closeDrawer() {
+      wordsDrawer.classList.remove('open');
+      drawerBackdrop.classList.remove('open');
+    }
+
+    btnNextQuiz.addEventListener('click', () => {
+      showQuizMode();
+    });
+
+    btnSkip.addEventListener('click', goNext);
+    btnPrev.addEventListener('click', goPrev);
+
+    btnPronounce.addEventListener('click', () => {
+      speakSpanish(WORDS[currentIndex].es);
+    });
+
+    emojiClue.addEventListener('click', () => {
+      speakSpanish(WORDS[currentIndex].es);
+    });
+
+    btnSoundToggle.addEventListener('click', () => {
+      soundEnabled = !soundEnabled;
+      updateSoundButtonUI();
+      saveState();
+      showToast(soundEnabled ? 'Sonido activado 🔊' : 'Sonido silenciado 🔇');
+    });
+
+    btnList.addEventListener('click', openDrawer);
+    btnCloseDrawer.addEventListener('click', closeDrawer);
+    drawerBackdrop.addEventListener('click', closeDrawer);
+    drawerSearch.addEventListener('input', (e) => renderCatalog(e.target.value));
+
+    // Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').then((reg) => {
+          document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+              reg.update();
+            }
+          });
+        }).catch(err => console.log('SW registration error:', err));
+
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          window.location.reload();
+        });
+      });
+    }
+
+    // Install prompt
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.style.display = 'inline-flex';
+    });
+
+    installBtn.addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const res = await deferredPrompt.userChoice;
+        if (res && res.outcome === 'accepted') {
+          installBtn.style.display = 'none';
+        }
+        deferredPrompt = null;
+      }
+    });
+
+    window.addEventListener('appinstalled', () => {
+      installBtn.style.display = 'none';
+      showToast('¡App instalada exitosamente! 📱');
+    });
+
+    restoreState();
+    renderWord();
+  </script>
+</body>
+</html>
